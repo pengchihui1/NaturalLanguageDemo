@@ -1,5 +1,6 @@
-// 当初始的 HTML 文档被完全加载和解析完成之后，DOMContentLoaded 事件被触发，而无需等待样式表、图像和子框架的完全加载。
-// document.addEventListener('DOMContentLoaded', speechToEmotion, false)
+
+
+let final_transcript = '' //頁面內容
 
 // 重新開始遊戲
 function again() {
@@ -14,6 +15,9 @@ function again() {
 
     clearInterval(window.languageCarTimer) // 清除語言頁面倒計時
     clearInterval(window.endCarTimer) // 清除結束頁面倒計時
+
+    final_transcript = '' // 重置顯示的內容
+    $("#emotion_recognition_p").text('')
 }
 
 // 選擇語言
@@ -59,17 +63,19 @@ function language_start() {
 function pin_code_start() {
     $("#emotion_recognition").css("display", "block")
 
+    speechToEmotion(); //啟動錄製聲音
+
     // 倒計時 
-    window.emotionRecognitionNum = 10
-    $('#emotion_recognition_title').text(`情緒識別（${window.emotionRecognitionNum}）`)
-    window.emotionRecognitionTimer = setInterval(() => {
-        window.emotionRecognitionNum -= 1
-        $('#emotion_recognition_title').text(`情緒識別（${window.emotionRecognitionNum}）`)
-        if (window.emotionRecognitionNum <= 0) {
-            clearInterval(window.emotionRecognitionTimer) // 清除倒計時
-            emotion_recognition_next()
-        }
-    }, 1000)
+    // window.emotionRecognitionNum = 10
+    // $('#emotion_recognition_title').text(`情緒識別（${window.emotionRecognitionNum}）`)
+    // window.emotionRecognitionTimer = setInterval(() => {
+    //     window.emotionRecognitionNum -= 1
+    //     $('#emotion_recognition_title').text(`情緒識別（${window.emotionRecognitionNum}）`)
+    //     if (window.emotionRecognitionNum <= 0) {
+    //         clearInterval(window.emotionRecognitionTimer) // 清除倒計時
+    //         emotion_recognition_next()
+    //     }
+    // }, 1000)
 }
 
 function emotion_recognition_next() {
@@ -106,54 +112,30 @@ function emotion_recognition_result_next() {
 
 function speechToEmotion() {
 
+    // 需要vpn和chrome的，目前只支持chrome
     const recognition = new webkitSpeechRecognition()
-    recognition.lang = 'en-US'
-    recognition.continuous = true
+    recognition.lang = 'cmn-Hans-CN'
+    recognition.continuous = true //识别到声音就关闭，还是一直识别
+    recognition.start();//开启录音
 
-    recognition.onresult = function (event) {
+    recognition.onresult = function (event) {//每次說話會觸發
+        var interim_transcript = '';
+        for (var i = event.resultIndex; i < event.results.length; ++i) {
+            if (event.results[i].isFinal) {
+                final_transcript += event.results[i][0].transcript;
+            } else {
+                interim_transcript += event.results[i][0].transcript;
+            }
+        }
 
-        const results = event.results
-        const transcript = results[results.length - 1][0].transcript
-
-        setEmoji('searching')
-
-        fetch(`/emotion?text=${transcript}`)
-            .then((response) => response.json())
-            .then((result) => {
-                console.log("結果:", result)
-                if (result.score > 0) {
-                    setEmoji('positive')
-                } else if (result.score < 0) {
-                    setEmoji('negative')
-                } else {
-                    setEmoji('neutral')
-                }
-            })
-            .catch((e) => {
-                console.error('Request error -> ', e)
-                recognition.abort()
-            })
+        final_transcript = capitalize(final_transcript);
+        $("#emotion_recognition_p").text(final_transcript)
     }
 
-    recognition.onerror = function (event) {
-        console.error('Recognition error -> ', event.error)
-        setEmoji('error')
-    }
-
-    recognition.onaudiostart = function () {
-        setEmoji('listening')
-    }
-
-    recognition.onend = function () {
-        setEmoji('idle')
-    }
-
-    recognition.start();
-
-    function setEmoji(type) {
-        const emojiElem = document.querySelector('.emoji img')
-        emojiElem.classList = type
-    }
 }
 
+var first_char = /\S/;
+function capitalize(s) {
+    return s.replace(first_char, function (m) { return m.toUpperCase(); });
+}
 

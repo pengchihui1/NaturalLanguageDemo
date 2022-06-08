@@ -291,10 +291,10 @@ body {
 
 .emotion_recognition_p{
   background-color: #fff;
-  width:600px;
+  width:50%;
+  font-size: large;
   height: 200px;
-  text-align: center;
-  padding: 5px;
+  padding: 15px;
   border-radius: 20px;
   margin-top:40px;
 }
