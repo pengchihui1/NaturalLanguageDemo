@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Natural Language</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" href="assets/web_icon.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-1.7.1.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/annyang/2.6.1/annyang.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/SpeechKITT/0.3.0/speechkitt.min.js"></script>
+
+</head>
+<body>
+ 
+  <script>
+ if (annyang) {
+
+  // 將我們的命令添加到 annyang
+    annyang.addCommands({
+      'hello': function() { alert('Hello world!'); }
+    });
+
+  // 語音識別
+  SpeechKITT.annyang();
+
+  // 告诉 KITT 为其 GUI 使用哪个样式表
+  SpeechKITT.setStylesheet('//cdnjs.cloudflare.com/ajax/libs/SpeechKITT/0.3.0/themes/flat.css');
+
+  // 启动你的引擎
+  var dd= SpeechKITT.vroom();
+}
+  </script>
+
+</body>
+</html>

@@ -1,3 +1,6 @@
+// 当初始的 HTML 文档被完全加载和解析完成之后，DOMContentLoaded 事件被触发，而无需等待样式表、图像和子框架的完全加载。
+// document.addEventListener('DOMContentLoaded', speechToEmotion, false)
+
 // 重新開始遊戲
 function again() {
     $("#main").css('display', 'block');
@@ -55,6 +58,7 @@ function language_start() {
 
 function pin_code_start() {
     $("#emotion_recognition").css("display", "block")
+
     // 倒計時 
     window.emotionRecognitionNum = 10
     $('#emotion_recognition_title').text(`情緒識別（${window.emotionRecognitionNum}）`)
@@ -100,5 +104,56 @@ function emotion_recognition_result_next() {
     }, 1000)
 }
 
+function speechToEmotion() {
+
+    const recognition = new webkitSpeechRecognition()
+    recognition.lang = 'en-US'
+    recognition.continuous = true
+
+    recognition.onresult = function (event) {
+
+        const results = event.results
+        const transcript = results[results.length - 1][0].transcript
+
+        setEmoji('searching')
+
+        fetch(`/emotion?text=${transcript}`)
+            .then((response) => response.json())
+            .then((result) => {
+                console.log("結果:", result)
+                if (result.score > 0) {
+                    setEmoji('positive')
+                } else if (result.score < 0) {
+                    setEmoji('negative')
+                } else {
+                    setEmoji('neutral')
+                }
+            })
+            .catch((e) => {
+                console.error('Request error -> ', e)
+                recognition.abort()
+            })
+    }
+
+    recognition.onerror = function (event) {
+        console.error('Recognition error -> ', event.error)
+        setEmoji('error')
+    }
+
+    recognition.onaudiostart = function () {
+        setEmoji('listening')
+    }
+
+    recognition.onend = function () {
+        setEmoji('idle')
+    }
+
+    recognition.start();
+
+    function setEmoji(type) {
+        const emojiElem = document.querySelector('.emoji img')
+        emojiElem.classList = type
+    }
+}
 
 
