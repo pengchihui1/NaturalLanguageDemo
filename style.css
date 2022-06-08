@@ -135,7 +135,7 @@ body {
   font-size: 69px;
 }
 
-#main_button{
+.main_button{
   width: 892px;
   height: 202px;
 
@@ -233,7 +233,7 @@ body {
   font-size: 50px;
 }
 
-#text {
+/* #text {
   position: absolute;
   top: 100%;
   left: 50%;
@@ -245,7 +245,7 @@ body {
   font-family: "doodleFont";
   color: rgb(255, 255, 255);
   font-size: 25px;
-}
+} */
 
 .frame {
   fill: #ffff;
@@ -289,36 +289,16 @@ body {
   text-decoration: underline;
 }
 
-#hand_shodow canvas {
-  position: relative;
-  left: 50%;
-  top: 20%;
-  transform: translate(-50%, -50%);
+.emotion_recognition_p{
   background-color: #fff;
+  width:600px;
+  height: 200px;
+  text-align: center;
+  padding: 5px;
+  border-radius: 20px;
+  margin-top:40px;
 }
 
 .active{
   box-shadow: 0px 0px 8px red;
-}
-
-#qrcode_avatar{
- display: flex;
- justify-content: center;
- margin-top: 20px;
-}
-
-.qrcode_photo canvas,
-.qrcode_photo video,
-.qrcode_photo img{
-  width: 300px;
-  height: 300px;
-  background-color: #fff;
-  margin: 0 5px;
-}
-  
-.qrcode_p{
-  color:  #fff;
-  font-size: 30px;
-  margin: 10px;
-  text-align: center;
 }
