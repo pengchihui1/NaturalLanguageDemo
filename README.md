@@ -1,1 +1,2 @@
-# NaturalLanguageDemo
+# 項目簡介
+錄製聲音，系統猜測
