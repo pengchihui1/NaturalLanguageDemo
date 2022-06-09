@@ -3,4 +3,4 @@
 
 ## 資料
 google cloud支持語言：https://cloud.google.com/speech-to-text/docs/languages
-webkitSpeechRecognition api簡介：https://www.jianshu.com/p/e42638839475
+錄音主要方法介紹：http://xiaohuazheng.github.io/2019/09/29/web-speech/

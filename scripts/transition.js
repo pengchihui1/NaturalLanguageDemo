@@ -1,6 +1,8 @@
 
 
 let final_transcript = '' //頁面內容
+let turn_state = false //開啟
+let speech_pause = false //暫停
 
 // 重新開始遊戲
 function again() {
@@ -18,6 +20,8 @@ function again() {
 
     final_transcript = '' // 重置顯示的內容
     $("#emotion_recognition_p").text('')
+
+    $("#emotion_recognition_button button").css('border-color', 'black')//按鈕邊框顏色初始化
 }
 
 // 選擇語言
@@ -63,7 +67,7 @@ function language_start() {
 function pin_code_start() {
     $("#emotion_recognition").css("display", "block")
 
-    speechToEmotion(); //啟動錄製聲音
+
 
     // 倒計時 
     // window.emotionRecognitionNum = 10
@@ -110,26 +114,46 @@ function emotion_recognition_result_next() {
     }, 1000)
 }
 
-function speechToEmotion() {
-
+function speechStart() {
+    activeButton(1)//按鈕變色
     // 需要vpn和chrome的，目前只支持chrome
-    const recognition = new webkitSpeechRecognition()
+    window.recognition = new webkitSpeechRecognition()
     recognition.lang = 'cmn-Hans-CN'
-    recognition.continuous = true //识别到声音就关闭，还是一直识别
-    recognition.start();//开启录音
+    recognition.continuous = true; // 配置设置以使每次识别都返回连续结果
+    recognition.interimResults = true;// 配置应返回临时结果的设置
+    recognition.start()
 
-    recognition.onresult = function (event) {//每次說話會觸發
-        var interim_transcript = '';
-        for (var i = event.resultIndex; i < event.results.length; ++i) {
-            if (event.results[i].isFinal) {
-                final_transcript += event.results[i][0].transcript;
-            } else {
-                interim_transcript += event.results[i][0].transcript;
+    recognition.onstart = function () {
+        turn_state = true
+    };
+
+    recognition.onresult = function (event) { //每次說話，把準確率最高的那個顯示在頁面上
+        // 第幾次說話便從第幾次追加內容
+        if (!speech_pause) {
+            var interim_transcript = '';
+            for (var i = event.resultIndex; i < event.results.length; ++i) {
+                if (event.results[i].isFinal) {
+                    final_transcript += final_transcript?.length ? `，${event.results[i][0].transcript}` : event.results[i][0].transcript;
+                } else {
+                    interim_transcript += event.results[i][0].transcript;
+                }
             }
         }
 
         final_transcript = capitalize(final_transcript);
         $("#emotion_recognition_p").text(final_transcript)
+    }
+
+    recognition.onend = function () { //語音結束時觸發
+        if (turn_state) {
+            recognition.start();
+        } else {
+            recognition.stop();
+        }
+    };
+
+    recognition.onerror = function (event) {
+        console.log('onerror', event.message);
     }
 
 }
@@ -139,3 +163,43 @@ function capitalize(s) {
     return s.replace(first_char, function (m) { return m.toUpperCase(); });
 }
 
+// 暫停
+function speechPause() {
+    activeButton(2)//按鈕變色
+    // 暫停設置及內容
+    if (window.recognition) speech_pause = true
+}
+
+// 繼續
+function speechContinue() {
+    activeButton(3)//按鈕變色
+    // 暫停設置及內容
+    if (window.recognition) speech_pause = false
+}
+
+//重置 
+function speechReset() {
+    activeButton(4)//按鈕變色
+    // 內容清空
+    final_transcript = ''
+    $("#emotion_recognition_p").text('')
+}
+
+//結束 
+function speechEnd() {
+    activeButton(5)//按鈕變色
+    // 內容清空
+    final_transcript = ''
+    $("#emotion_recognition_p").text('')
+    // 停止錄音 錄音有的話
+    if (turn_state) {
+        turn_state = false;
+        window.recognition.stop();
+    }
+
+}
+
+function activeButton(num) {
+    $("#emotion_recognition_button button").css('border-color', 'black')
+    $(`#emotion_recognition_button button:eq(${num - 1})`).css('border-color', 'red')
+}

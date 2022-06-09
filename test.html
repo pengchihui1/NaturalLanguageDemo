@@ -276,6 +276,7 @@ if (!('webkitSpeechRecognition' in window)) {
     }
   };
   recognition.onresult = function(event) {//当接收到一个成功的消息之后就会触发
+    // 第幾次說話便從第幾次追加內容
     var interim_transcript = '';
     for (var i = event.resultIndex; i < event.results.length; ++i) {
       if (event.results[i].isFinal) {
@@ -284,6 +285,11 @@ if (!('webkitSpeechRecognition' in window)) {
         interim_transcript += event.results[i][0].transcript;
       }
     }
+    // 所有內容
+    // var temp_transcript = [...event.results]
+    //             .map(result => result[0])
+    //             .map(result => result.transcript)
+    //             .join('，');
     final_transcript = capitalize(final_transcript);
     final_span.innerHTML = linebreak(final_transcript);
     interim_span.innerHTML = linebreak(interim_transcript);
